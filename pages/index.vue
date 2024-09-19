@@ -237,6 +237,12 @@ body {
     width: 100vw;
     height: 100px;
     margin: 15px 0px 0px 0px;
+    position: fixed;
+    bottom: 0;
+    /* Центрирование */
+    left: 0;
+    right: 0;
+    margin: 0 auto;
 }
 
 .navbar {
