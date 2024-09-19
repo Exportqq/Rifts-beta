@@ -11,5 +11,6 @@
 * {
     margin: 0px;
     padding: 0px;
+    overflow: hidden;
 }
 </style>
