@@ -87,7 +87,7 @@ body {
 .backround {
     background: rgb(245, 245, 245);
     width: 100vw;
-    height: 800px;
+    height: 1000px;
 }
 
 
@@ -240,6 +240,7 @@ body {
 }
 
 .navbar {
-    position: fixed;
+    position: -webkit-sticky;
+    position: sticky;
 }
 </style>
