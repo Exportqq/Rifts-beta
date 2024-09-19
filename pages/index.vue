@@ -45,30 +45,34 @@ export default {
       WORD_TWO_status: false,
       WORD_THREE_status: false,
       WORD_FOUR_status: false,
-    }},
-    methods: {
-        selectWord(selectedWord) {
-            // Сброс всех статусов
-            this.WORD_ONE_status = false;
-            this.WORD_TWO_status = false;
-            this.WORD_THREE_status = false;
-            this.WORD_FOUR_status = false;
+    };
+  },
+  methods: {
+    selectWord(selectedWord) {
+      // Отключаем вертикальные свайпы
+      window.Telegram.WebApp.disableVerticalSwipes();
 
-            // Установка статуса для выбранного слова
-            if (selectedWord === 'WORD_ONE') {
-                this.WORD_ONE_status = true;
-            } else if (selectedWord === 'WORD_TWO') {
-                this.WORD_TWO_status = true;
-            } else if (selectedWord === 'WORD_THREE') {
-                this.WORD_THREE_status = true;
-            } else if (selectedWord === 'WORD_FOUR') {
-                this.WORD_FOUR_status = true;
-            }
-        }
+      // Сброс всех статусов
+      this.WORD_ONE_status = false;
+      this.WORD_TWO_status = false;
+      this.WORD_THREE_status = false;
+      this.WORD_FOUR_status = false;
+
+      // Установка статуса для выбранного слова
+      if (selectedWord === 'WORD_ONE') {
+        this.WORD_ONE_status = true;
+      } else if (selectedWord === 'WORD_TWO') {
+        this.WORD_TWO_status = true;
+      } else if (selectedWord === 'WORD_THREE') {
+        this.WORD_THREE_status = true;
+      } else if (selectedWord === 'WORD_FOUR') {
+        this.WORD_FOUR_status = true;
+      }
     }
   }
-    
+};
 </script>
+
 
 <style scoped>
 * {

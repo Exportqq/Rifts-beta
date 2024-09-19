@@ -15,6 +15,5 @@
 
 body {
   overflow: hidden;
-  position:fixed;
 }
 </style>
