@@ -14,6 +14,6 @@
 }
 
 body {
-  overflow: hidden;
+  overflow: scroll;
 }
 </style>
