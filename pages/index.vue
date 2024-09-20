@@ -17,7 +17,7 @@
                     <p class="timer">23:24:09</p>
                     <div class="decor-line"></div>
                     <p class="quest-txt">Log in to the game every day to earn $RIFT</p>
-                    <button class="start-quest">start</button>
+                    <button class="start-quest" @click="startFillAnimation">{{ start_txt }}</button>
                 </div>
             </div>
             <div class="theory-navigation">
@@ -25,7 +25,50 @@
             </div>
             <div class="navbar">
                 <div class="navbar-block">
-
+                    <ul>
+                        <li>
+                            <div class="home-block">
+                                <button v-if="!home_status" @click="selectWord('home')" class="home-btn">
+                                    <img src="public/home.png">
+                                    <p class="navbar-txt">home</p>
+                                </button>
+                                <button v-if="home_status" @click="selectWord('home')" class="home-btn-animation-active">
+                                    <img src="public/home.png">
+                                    <p class="navbar-txt">home</p>
+                                </button>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="decor-line-navbar"></div>
+                        </li>
+                        <li>
+                            <div class="home-block">
+                                <button v-if="!task_status" @click="selectWord('task')" class="home-btn">
+                                    <img src="public/task.png">
+                                    <p class="navbar-txt">tasks</p>
+                                </button>
+                                <button v-if="task_status" @click="selectWord('task')" class="home-btn-animation-active">
+                                    <img src="public/task.png">
+                                    <p class="navbar-txt">tasks</p>
+                                </button>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="decor-line-navbar"></div>
+                        </li>
+                        <li>
+                            <div class="home-block">
+                                <button v-if="!friends_status" @click="selectWord('friends')" class="home-btn">
+                                    <img src="public/friends.png">
+                                    <p class="navbar-txt">friends</p>
+                                </button>
+                                <button v-if="friends_status" @click="selectWord('friends')" class="home-btn-animation-active">
+                                    <img src="public/friends.png">
+                                    <p class="navbar-txt">friends</p>
+                                </button>
+                            </div>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -37,37 +80,47 @@
 export default {
   data() {
     return {
-      WORD_ONE: 'Bitcoin',
-      WORD_TWO: 'Ethereum',
-      WORD_THREE: 'Solana',
-      WORD_FOUR: 'Cardano',
-      WORD_ONE_status: false,
-      WORD_TWO_status: false,
-      WORD_THREE_status: false,
-      WORD_FOUR_status: false,
+        start_txt: 'start', // Исходный текст кнопки
+        home_status: false,
+        task_status: false,
+        friends_status: false,
+        WORD_ONE: 'home',
+        WORD_TWO: 'task',
+        WORD_THREE: 'friends',
     };
   },
   methods: {
     selectWord(selectedWord) {
-      // Отключаем вертикальные свайпы
+      // Отключаем вертикальные свайпы НЕ ТРОГАТЬ
       window.Telegram.WebApp.disableVerticalSwipes();
 
-      // Сброс всех статусов
-      this.WORD_ONE_status = false;
-      this.WORD_TWO_status = false;
-      this.WORD_THREE_status = false;
-      this.WORD_FOUR_status = false;
+      this.home_status = false;
+      this.task_status = false;
+      this.friends_status = false;
 
       // Установка статуса для выбранного слова
-      if (selectedWord === 'WORD_ONE') {
-        this.WORD_ONE_status = true;
-      } else if (selectedWord === 'WORD_TWO') {
-        this.WORD_TWO_status = true;
-      } else if (selectedWord === 'WORD_THREE') {
-        this.WORD_THREE_status = true;
-      } else if (selectedWord === 'WORD_FOUR') {
-        this.WORD_FOUR_status = true;
+      if (selectedWord === 'home') {
+        this.home_status = true;
+      } else if (selectedWord === 'task') {
+        this.task_status = true;
+      } else if (selectedWord === 'friends') {
+        this.friends_status = true;
       }
+    },
+    startFillAnimation() {
+      // Получаем кнопку
+      const startButton = document.querySelector('.start-quest');
+      
+      // Меняем текст кнопки на пустое значение
+      this.start_txt = ''; // Обновляем переменную, которая контролирует текст кнопки
+      
+      // Добавляем класс для анимации
+      startButton.classList.add('start-quest-animate');
+      
+      // Чтобы анимация сработала, добавляем класс активации с задержкой
+      setTimeout(() => {
+        startButton.classList.add('start-quest-animate-active');
+      }, 10);
     }
   }
 };
@@ -243,10 +296,71 @@ body {
     left: 0;
     right: 0;
     margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .navbar {
     position: -webkit-sticky;
     position: sticky;
+}
+
+.home-btn {
+    width: 58px;
+    height: 58px;
+    background: none;
+    border: none;
+}
+
+.home-btn-animation-active {
+    width: 58px;
+    height: 58px;
+    background: none;
+    box-sizing: border-box;
+    border: 3px solid rgb(255, 255, 255);
+    border-radius: 6px;
+    backdrop-filter: blur(122px);
+}
+
+.navbar-txt {
+    color: rgb(255, 255, 255);
+    font-family: 'Bebas Neue';
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 22px;
+    letter-spacing: 0px;
+    text-align: center;
+}
+
+ul li {
+    float: left;
+    list-style: none;
+}
+
+.decor-line-navbar {
+    width: 3px;
+    height: 50px;
+    border-radius: 1408px;
+    background: rgb(255, 255, 255);
+    margin: 4px 40px 0px 40px;
+}
+
+.start-quest-animate {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 100vw; /* Изначальные размеры кнопки */
+  height: 100vh; /* Изначальные размеры кнопки */
+  background-color: rgb(249, 205, 98); /* Цвет фона кнопки */
+  transform: translate(-50%, -50%) scale(0); /* Начальное состояние анимации */
+  transition: transform 0.7s ease-in-out; /* Продолжительность анимации */
+  border-radius: 0; /* Убираем скругление кнопки, если оно есть */
+  z-index: 2; /* Убедитесь, что кнопка будет поверх других элементов */
+}
+
+/* Класс для активации анимации */
+.start-quest-animate-active {
+  transform: translate(-50%, -50%) scale(100); /* Конечное состояние анимации */
 }
 </style>
