@@ -17,7 +17,7 @@
                     <p class="timer">23:24:09</p>
                     <div class="decor-line"></div>
                     <p class="quest-txt">Log in to the game every day to earn $RIFT</p>
-                    <button class="start-quest" @click="startFillAnimation">{{ start_txt }}</button>
+                    <button class="start-quest" ref="startButton" @click="startFillAnimation">{{ start_txt }}</button>
                 </div>
             </div>
             <div class="theory-navigation">
@@ -80,13 +80,13 @@
 export default {
   data() {
     return {
-        start_txt: 'start', // Исходный текст кнопки
-        home_status: false,
-        task_status: false,
-        friends_status: false,
-        WORD_ONE: 'home',
-        WORD_TWO: 'task',
-        WORD_THREE: 'friends',
+      start_txt: 'start', // Исходный текст кнопки
+      home_status: false,
+      task_status: false,
+      friends_status: false,
+      WORD_ONE: 'home',
+      WORD_TWO: 'task',
+      WORD_THREE: 'friends',
     };
   },
   methods: {
@@ -108,24 +108,29 @@ export default {
       }
     },
     startFillAnimation() {
-      // Получаем кнопку
-      const startButton = document.querySelector('.start-quest');
-      
+      // Получаем кнопку через ref
+      const startButton = this.$refs.startButton;
+
       // Меняем текст кнопки на пустое значение
       this.start_txt = ''; // Обновляем переменную, которая контролирует текст кнопки
-      
+
       // Добавляем класс для анимации
       startButton.classList.add('start-quest-animate');
-      
+
       // Чтобы анимация сработала, добавляем класс активации с задержкой
       setTimeout(() => {
         startButton.classList.add('start-quest-animate-active');
       }, 10);
+
+      // Через 1 секунду происходит переход на страницу quest_one.vue
+      setTimeout(() => {
+        // Перенаправление на страницу quest_one.vue
+        this.$router.push({ name: 'quests' });
+      }, 500);
     }
   }
 };
 </script>
-
 
 <style scoped>
 * {
