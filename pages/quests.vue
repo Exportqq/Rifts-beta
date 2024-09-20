@@ -61,26 +61,26 @@
         <div class="answers-nav">
           <button 
             class="answers" 
-            :class="{ 'selected': selectedAnswer === 'PoW' }" 
-            @click="selectAnswer('PoW')">
+            :class="{ 'selected': selectedAnswer === 'Uniswap' }" 
+            @click="selectAnswer('Uniswap')">
             Uniswap
           </button>
           <button 
             class="answers" 
-            :class="{ 'selected': selectedAnswer === 'PoS' }" 
-            @click="selectAnswer('PoS')">
+            :class="{ 'selected': selectedAnswer === 'Coinbase' }" 
+            @click="selectAnswer('Coinbase')">
             Coinbase
           </button>
           <button 
             class="answers" 
-            :class="{ 'selected': selectedAnswer === 'DPoS' }" 
-            @click="selectAnswer('DPoS')">
+            :class="{ 'selected': selectedAnswer === 'Binance' }" 
+            @click="selectAnswer('Binance')">
             Binance
           </button>
           <button 
             class="answers" 
-            :class="{ 'selected': selectedAnswer === 'BFT' }" 
-            @click="selectAnswer('BFT')">
+            :class="{ 'selected': selectedAnswer === 'Kraken' }" 
+            @click="selectAnswer('Kraken')">
             Kraken
           </button>
 
@@ -149,6 +149,7 @@
     <div v-else-if="currentQuestion === 4" class="backround-quest-three">
 
           <p>Total prize: {{ prize }} $RIFTS</p>
+          <button @click="navigateToHome">back home</button>
     </div>
 
     
@@ -177,6 +178,9 @@ export default {
   methods: {
     selectAnswer(answer) {
       this.selectedAnswer = answer;
+    },
+    navigateToHome() {
+      this.$router.push({ name: 'index' });
     },
     handleChoose() {
       if (this.selectedAnswer) {

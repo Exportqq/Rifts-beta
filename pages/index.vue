@@ -14,10 +14,25 @@
             </div>
             <div class="quest-block-navigation">
                 <div class="quest-block">
-                    <p class="timer">23:24:09</p>
+                    <p class="timer">{{ timerDisplay }}</p>
                     <div class="decor-line"></div>
                     <p class="quest-txt">Log in to the game every day to earn $RIFT</p>
-                    <button class="start-quest" ref="startButton" @click="startFillAnimation">{{ start_txt }}</button>
+                    <button v-if="btn_status == true"
+                        class="start-quest" 
+                        ref="startButton" 
+                        @click="startFillAnimation" 
+                        :disabled="isButtonDisabled">
+                        {{ start_txt }}
+                    </button>
+
+                    <button v-if="btn_status == false"
+                        class="start-quest-no" 
+                        ref="startButton" 
+                        @click="startFillAnimation" 
+                        :disabled="isButtonDisabled">
+                        {{ start_txt }}
+                    </button>
+                                    
                 </div>
             </div>
             <div class="theory-navigation">
@@ -77,58 +92,157 @@
 </template>
 
 <script>
+import moment from 'moment-timezone';
+
 export default {
   data() {
     return {
-      start_txt: 'start', // Исходный текст кнопки
+      start_txt: 'start', // Original text for the button
       home_status: false,
       task_status: false,
       friends_status: false,
       WORD_ONE: 'home',
       WORD_TWO: 'task',
       WORD_THREE: 'friends',
+      timerDisplay: '00:00:00',
+      timeUntil14: 0, // in seconds
+      timerInterval: null,
+      isButtonDisabled: false,
+      btn_status: true, // Reflects the button's active state
     };
   },
+  mounted() {
+    this.updateTimer(); // Initial call to set the timer
+    this.timerInterval = setInterval(this.updateTimer, 1000); // Update every second
+
+    // Initialize button state on mount
+    this.initializeButtonState();
+  },
+  beforeDestroy() {
+    // Clear interval to prevent memory leaks
+    if (this.timerInterval) {
+      clearInterval(this.timerInterval);
+    }
+  },
+  computed: {
+    lastClickTime() {
+      const storedTime = localStorage.getItem('lastClickTime');
+      return storedTime ? moment(storedTime) : null;
+    },
+  },
   methods: {
+    // Timer Methods
+    updateTimer() {
+      const now = moment().tz('Europe/Moscow');
+      const targetTime = moment().tz('Europe/Moscow').hour(14).minute(0).second(0);
+
+      if (now.isAfter(targetTime)) {
+        targetTime.add(1, 'day');
+      }
+
+      const diff = targetTime.diff(now, 'seconds');
+      if (diff !== this.timeUntil14) {
+        this.timeUntil14 = diff;
+        this.formatTimeRemaining(diff);
+      }
+    },
+
+    formatTimeRemaining(seconds) {
+      const duration = moment.duration(seconds, 'seconds');
+      this.timerDisplay = `${duration.hours().toString().padStart(2, '0')}:${duration.minutes()
+        .toString()
+        .padStart(2, '0')}:${duration.seconds().toString().padStart(2, '0')}`;
+    },
+
+    // Word Selection Method
     selectWord(selectedWord) {
-      // Отключаем вертикальные свайпы НЕ ТРОГАТЬ
+      // Disable vertical swipes (Telegram WebApp specific)
       window.Telegram.WebApp.disableVerticalSwipes();
 
+      // Reset all statuses
       this.home_status = false;
       this.task_status = false;
       this.friends_status = false;
 
-      // Установка статуса для выбранного слова
-      if (selectedWord === 'home') {
+      // Set the status for the selected word
+      if (selectedWord === this.WORD_ONE) {
         this.home_status = true;
-      } else if (selectedWord === 'task') {
+      } else if (selectedWord === this.WORD_TWO) {
         this.task_status = true;
-      } else if (selectedWord === 'friends') {
+      } else if (selectedWord === this.WORD_THREE) {
         this.friends_status = true;
       }
     },
+
+    // Initialize Button State on Component Mount
+    initializeButtonState() {
+      if (this.lastClickTime) {
+        const now = moment();
+        const hoursSinceLastClick = now.diff(this.lastClickTime, 'hours');
+        if (hoursSinceLastClick < 24) {
+          this.isButtonDisabled = true;
+          this.btn_status = false; // Button is disabled
+          console.log('Button is disabled on load. Hours since last click:', hoursSinceLastClick);
+
+          // Calculate remaining time and set a timer to enable the button
+          const remainingMilliseconds = moment(this.lastClickTime).add(24, 'hours').diff(now);
+          setTimeout(() => {
+            this.isButtonDisabled = false;
+            this.btn_status = true; // Button becomes active again
+            console.log('Button has been re-enabled after 24 hours.');
+          }, remainingMilliseconds);
+        } else {
+          this.isButtonDisabled = false;
+          this.btn_status = true; // Button is active
+        }
+      }
+    },
+
+    // Button Click Handler
     startFillAnimation() {
-      // Получаем кнопку через ref
-      const startButton = this.$refs.startButton;
+      const now = moment();
 
-      // Меняем текст кнопки на пустое значение
-      this.start_txt = ''; // Обновляем переменную, которая контролирует текст кнопки
+      if (!this.lastClickTime || now.diff(this.lastClickTime, 'hours') >= 24) {
+        try {
+          // Save the current click time to localStorage
+          localStorage.setItem('lastClickTime', now.toISOString());
+          console.log('Click time saved:', now.toISOString());
 
-      // Добавляем класс для анимации
-      startButton.classList.add('start-quest-animate');
+          // Update button state to disabled
+          this.isButtonDisabled = true;
+          this.btn_status = false; // Button becomes disabled
 
-      // Чтобы анимация сработала, добавляем класс активации с задержкой
-      setTimeout(() => {
-        startButton.classList.add('start-quest-animate-active');
-      }, 10);
+          // Existing button animation logic
+          const startButton = this.$refs.startButton;
+          this.start_txt = '';
+          startButton.classList.add('start-quest-animate');
+          setTimeout(() => {
+            startButton.classList.add('start-quest-animate-active');
+          }, 10);
 
-      // Через 1 секунду происходит переход на страницу quest_one.vue
-      setTimeout(() => {
-        // Перенаправление на страницу quest_one.vue
-        this.$router.push({ name: 'quests' });
-      }, 500);
+          setTimeout(() => {
+            this.$router.push({ name: 'quests' });
+          }, 500);
+
+          // Schedule re-enabling the button after 24 hours
+          setTimeout(() => {
+            this.isButtonDisabled = false;
+            this.btn_status = true; // Button becomes active again
+            console.log('Button has been re-enabled after 24 hours.');
+          }, 24 * 60 * 60 * 1000); // 24 hours in milliseconds
+
+        } catch (e) {
+          console.error('Failed to save to localStorage:', e);
+          // Optionally, inform the user or implement a fallback
+        }
+      } else {
+        // If the button should remain disabled
+        this.isButtonDisabled = true;
+        this.btn_status = false; // Button is disabled
+        console.log('Button disabled. Time since last click:', now.diff(this.lastClickTime, 'hours'), 'hours');
+      }
     }
-  }
+  },
 };
 </script>
 
@@ -267,6 +381,22 @@ body {
     text-align: center;
     border-radius: 23px;
     background: rgb(249, 205, 98);
+    width: 366px;
+    height: 85px;
+    border: none;
+    margin: 125px 0px 0px 0px;
+}
+
+.start-quest-no {
+    color: rgb(255, 255, 255);
+    font-family: 'Bebas Neue';
+    font-size: 48px;
+    font-weight: 400;
+    line-height: 58px;
+    letter-spacing: 0px;
+    text-align: center;
+    border-radius: 23px;
+    background: rgb(128, 127, 127);
     width: 366px;
     height: 85px;
     border: none;
