@@ -22,3 +22,9 @@ logs
 .env
 .env.*
 !.env.example
+
+### Python
+
+# virtual environment
+.venv
+__pycache__
